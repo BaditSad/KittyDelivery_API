@@ -4,7 +4,6 @@ const app = express();
 const PORT = 3000;
 
 //Need the middleware here to check token
-
 //Ici on redirige les requêtes vers les bons microservices
 
 app.use('/api/mc_component', createProxyMiddleware({
@@ -27,23 +26,18 @@ app.use('/api/mc_order', createProxyMiddleware({
   changeOrigin: true,
 }));
 
-app.use('/api/mc_login', createProxyMiddleware({
+app.use('/api/mc_auth', createProxyMiddleware({
   target: 'http://localhost:3005',
   changeOrigin: true,
 }));
 
-app.use('/api/mc_user', createProxyMiddleware({
+app.use('/api/mc_article', createProxyMiddleware({
   target: 'http://localhost:3006',
   changeOrigin: true,
 }));
 
-app.use('/api/mc_article', createProxyMiddleware({
-  target: 'http://localhost:3007',
-  changeOrigin: true,
-}));
-
 app.use('/api/mc_token', createProxyMiddleware({
-  target: 'http://localhost:3008',
+  target: 'http://localhost:3007',
   changeOrigin: true,
 }));
 
