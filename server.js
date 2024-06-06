@@ -41,4 +41,9 @@ app.use('/api/mc_token', createProxyMiddleware({
   changeOrigin: true,
 }));
 
+app.use('/api/mc_menu', createProxyMiddleware({
+  target: 'http://localhost:3008',
+  changeOrigin: true,
+}));
+
 app.listen(PORT, () => console.log(`app running on http://localhost:${PORT}`));
