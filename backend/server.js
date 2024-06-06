@@ -1,30 +1,50 @@
+const { createProxyMiddleware } = require('http-proxy-middleware');
 const express = require('express');
-const cors = require('cors');
-const bodyParser = require("body-parser");
 const app = express();
-const port = 3000;
+const PORT = 3000;
 
-app.use(cors());
+//Need the middleware here to check token
 
-const db = require("./models");
-db.mongoose
-  .connect(db.url, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-  })
-  .then(() => {
-    console.log("Connected to the database!");
-  })
-  .catch(err => {
-    console.log("Cannot connect to the database!", err);
-    process.exit();
-  });
+//Ici on redirige les requêtes vers les bons microservices
 
-//Ici on envoit les infos vers le front
+app.use('/api/mc_component', createProxyMiddleware({
+  target: 'http://localhost:3001',
+  changeOrigin: true,
+}));
 
-app.get('/message', (req, res) => {
-    const message = 'messageType'
-    res.send(message);
-});
+app.use('/api/mc_user', createProxyMiddleware({
+  target: 'http://localhost:3002',
+  changeOrigin: true,
+}));
 
-app.listen(port, () => console.log('app running on http://localhost:3000'));
+app.use('/api/mc_notification', createProxyMiddleware({
+  target: 'http://localhost:3003',
+  changeOrigin: true,
+}));
+
+app.use('/api/mc_order', createProxyMiddleware({
+  target: 'http://localhost:3004',
+  changeOrigin: true,
+}));
+
+app.use('/api/mc_login', createProxyMiddleware({
+  target: 'http://localhost:3005',
+  changeOrigin: true,
+}));
+
+app.use('/api/mc_user', createProxyMiddleware({
+  target: 'http://localhost:3006',
+  changeOrigin: true,
+}));
+
+app.use('/api/mc_article', createProxyMiddleware({
+  target: 'http://localhost:3007',
+  changeOrigin: true,
+}));
+
+app.use('/api/mc_token', createProxyMiddleware({
+  target: 'http://localhost:3008',
+  changeOrigin: true,
+}));
+
+app.listen(PORT, () => console.log(`app running on http://localhost:${PORT}`));
