@@ -39,13 +39,18 @@ app.use('/api/mc_article', createProxyMiddleware({
   changeOrigin: true,
 }));
 
-app.use('/api/mc_token', createProxyMiddleware({
-  target: 'http://localhost:3007',
+app.use('/api/mc_menu', createProxyMiddleware({
+  target: 'http://localhost:3008',
   changeOrigin: true,
 }));
 
-app.use('/api/mc_menu', createProxyMiddleware({
-  target: 'http://localhost:3008',
+app.use('/api/mc_log', createProxyMiddleware({
+  target: 'http://localhost:3009',
+  changeOrigin: true,
+}));
+
+app.use('/api/mc_payment', createProxyMiddleware({
+  target: 'http://localhost:3010',
   changeOrigin: true,
 }));
 
