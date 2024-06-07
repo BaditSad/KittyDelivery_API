@@ -1,7 +1,10 @@
 const { createProxyMiddleware } = require('http-proxy-middleware');
 const express = require('express');
+const cors = require("cors");
 const app = express();
 const PORT = 3000;
+
+app.use(cors());
 
 //Need the middleware here to check token
 //Ici on redirige les requêtes vers les bons microservices
