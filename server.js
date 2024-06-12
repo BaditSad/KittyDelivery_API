@@ -1,57 +1,72 @@
-const { createProxyMiddleware } = require('http-proxy-middleware');
-const express = require('express');
+require("dotenv").config();
+const express = require("express");
 const cors = require("cors");
+const axios = require("axios");
+const jwt = require("jsonwebtoken");
+const { createProxyMiddleware } = require("http-proxy-middleware");
 const app = express();
-const PORT = 3000;
+const port = process.env.PORT;
+const PROXY_TARGETS = {
+  mc_component: process.env.MC_COMPONENT_URL,
+  mc_user: process.env.MC_USER_URL,
+  mc_notification: process.env.MC_NOTIFICATION_URL,
+  mc_order: process.env.MC_ORDER_URL,
+  mc_auth: process.env.MC_AUTH_URL,
+  mc_article: process.env.MC_ARTICLE_URL,
+  mc_menu: process.env.MC_MENU_URL,
+  mc_log: process.env.MC_LOG_URL,
+  mc_payment: process.env.MC_PAYMENT_URL,
+};
+const TOKEN_REFRESH_URL = process.env.TOKEN_REFRESH_URL;
 
-app.use(cors());
+app.use(
+  cors({
+    exposedHeaders: ["Newaccesstoken"],
+  })
+);
 
-//Need the middleware here to check token
-//Ici on redirige les requêtes vers les bons microservices
+const middleware = async (req, res, next) => {
+  const token = req.headers["authorization"];
+  if (!token) {
+    return res.status(444).send({ message: "No token provided." });
+  }
+  try {
+    jwt.verify(token.split(" ")[1], process.env.JWT_SECRET);
+    next();
+  } catch (err) {
+    try {
+      const response = await axios.post(TOKEN_REFRESH_URL, { token: token });
+      if (response.data.message === "Token refreshed successfully!") {
+        res.setHeader("Newaccesstoken", response.data.newAccessToken);
+        next();
+      } else {
+        return res.status(444).send({ message: "Failed to refresh token." });
+      }
+    } catch (error) {
+      return res.status(444).send({ message: "Failed to refresh token." });
+    }
+  }
+};
 
-app.use('/api/mc_component', createProxyMiddleware({
-  target: 'http://localhost:3001',
-  changeOrigin: true,
-}));
+app.use("/api/*", (req, res, next) => {
+  if (
+    req.originalUrl.startsWith("/api/mc_auth/login") ||
+    req.originalUrl.startsWith("/api/mc_auth/register")
+  ) {
+    next();
+  } else {
+    middleware(req, res, next);
+  }
+});
 
-app.use('/api/mc_user', createProxyMiddleware({
-  target: 'http://localhost:3002',
-  changeOrigin: true,
-}));
+Object.entries(PROXY_TARGETS).forEach(([path, target]) => {
+  app.use(
+    `/api/${path}`,
+    createProxyMiddleware({
+      target,
+      changeOrigin: true,
+    })
+  );
+});
 
-app.use('/api/mc_notification', createProxyMiddleware({
-  target: 'http://localhost:3003',
-  changeOrigin: true,
-}));
-
-app.use('/api/mc_order', createProxyMiddleware({
-  target: 'http://localhost:3004',
-  changeOrigin: true,
-}));
-
-app.use('/api/mc_auth', createProxyMiddleware({
-  target: 'http://localhost:3005',
-  changeOrigin: true,
-}));
-
-app.use('/api/mc_article', createProxyMiddleware({
-  target: 'http://localhost:3006',
-  changeOrigin: true,
-}));
-
-app.use('/api/mc_menu', createProxyMiddleware({
-  target: 'http://localhost:3008',
-  changeOrigin: true,
-}));
-
-app.use('/api/mc_log', createProxyMiddleware({
-  target: 'http://localhost:3009',
-  changeOrigin: true,
-}));
-
-app.use('/api/mc_payment', createProxyMiddleware({
-  target: 'http://localhost:3010',
-  changeOrigin: true,
-}));
-
-app.listen(PORT, () => console.log(`app running on http://localhost:${PORT}`));
+app.listen(port, () => console.log(`app running on http://localhost:${port}`));
