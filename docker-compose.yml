@@ -8,4 +8,18 @@ services:
     volumes:
       - .:/app
       - /app/node_modules
-    command: npm start
+    environment:
+      - PORT=3006
+      - MONGO_URI=mongodb://mongo:27017/kittydelivery
+    depends_on:
+      - mongo
+
+  mongo:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+volumes:
+  mongo-data:

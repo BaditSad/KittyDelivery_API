@@ -2,7 +2,7 @@
 FROM node:latest
 
 # Définir le répertoire de travail dans le conteneur
-WORKDIR /app
+WORKDIR /usr/src/app
 
 # Copier les fichiers package.json et package-lock.json dans le conteneur
 COPY package*.json ./
@@ -16,5 +16,5 @@ COPY . .
 # Exposer le port que l'application va utiliser
 EXPOSE 3000
 
-# Démarrer l'application avec nodemon
-CMD ["npm", "start"]
+# Démarrer l'application
+CMD ["node", "server.js"]
