@@ -3,8 +3,8 @@ const express = require("express");
 const cors = require("cors");
 const axios = require("axios");
 const jwt = require("jsonwebtoken");
-const mongoose = require('mongoose');
 const { createProxyMiddleware } = require("http-proxy-middleware");
+
 const app = express();
 const port = process.env.PORT;
 const PROXY_TARGETS = {
@@ -59,19 +59,6 @@ app.use("/api/*", (req, res, next) => {
     middleware(req, res, next);
   }
 });
-
-const dbUrl = process.env.MONGO_URI || "mongodb://localhost:27017/kittydelivery";
-
-mongoose
-  .connect(dbUrl, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => {
-    console.log("Connected to the database!");
-  })
-  .catch((err) => {
-    console.log("Cannot connect to the database!", err);
-    process.exit();
-  });
-
 
 Object.entries(PROXY_TARGETS).forEach(([path, target]) => {
   app.use(
