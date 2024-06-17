@@ -37,7 +37,7 @@ const middleware = async (req, res, next) => {
   } catch (err) {
     try {
       const response = await axios.post(TOKEN_REFRESH_URL, { token: token });
-      if (response.data.message === "Token refreshed successfully!") {
+      if (response.status === 201) {
         res.setHeader("Newaccesstoken", response.data.newAccessToken);
         next();
       } else {
