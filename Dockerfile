@@ -7,11 +7,15 @@ WORKDIR /usr/src/app
 # Copier les fichiers package.json et package-lock.json dans le conteneur
 COPY package*.json ./
 
-# Installer les dépendances du projet
+# Installation des dépendances
+COPY package*.json ./
 RUN npm install
 
-# Copier tous les fichiers du projet dans le conteneur
+# Copie des fichiers de l'application
 COPY . .
+
+# Copie du fichier .env
+COPY .env .env
 
 # Exposer le port que l'application va utiliser
 EXPOSE 3000

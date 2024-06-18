@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  app:
+  api:
     build: .
     ports:
       - "3000:3000"
@@ -9,17 +9,21 @@ services:
       - .:/app
       - /app/node_modules
     environment:
-      - PORT=3006
-      - MONGO_URI=mongodb://mongo:27017/kittydelivery
-    depends_on:
-      - mongo
+      - PORT=3000
+      - JWT_SECRET=cestpourlasciencemerciderestercourtoi
+      - TOKEN_REFRESH_URL=http://mc_auth:3005/refresh
+      - MC_COMPONENT_URL=http://mc_component:3001
+      - MC_USER_URL=http://mc_user:3002
+      - MC_NOTIFICATION_URL=http://mc_notif:3003
+      - MC_ORDER_URL=http://mc_order:3004
+      - MC_AUTH_URL=http://mc_auth:3005
+      - MC_ARTICLE_URL=http://mc_article:3006
+      - MC_MENU_URL=http://mc_menu:3008
+      - MC_LOG_URL=http://mc_log:3009
+      - MC_PAYMENT_URL=http://mc_payment:3010
+    networks:
+      - shared-net
 
-  mongo:
-    image: mongo:latest
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongo-data:/data/db
-
-volumes:
-  mongo-data:
+networks:
+  shared-net:
+    external: true
