@@ -3,7 +3,6 @@ const express = require("express");
 const cors = require("cors");
 const axios = require("axios");
 const jwt = require("jsonwebtoken");
-const mongoose = require('mongoose');
 const { createProxyMiddleware } = require("http-proxy-middleware");
 const app = express();
 const port = process.env.PORT;
@@ -28,17 +27,22 @@ app.use(
 
 const middleware = async (req, res, next) => {
   const token = req.headers["authorization"];
+  
   if (!token) {
     return res.status(444).send({ message: "No token provided." });
   }
+  
   try {
     jwt.verify(token.split(" ")[1], process.env.JWT_SECRET);
+  
     next();
   } catch (err) {
     try {
       const response = await axios.post(TOKEN_REFRESH_URL, { token: token });
-      if (response.data.message === "Token refreshed successfully!") {
+     
+      if (response.status === 201) {
         res.setHeader("Newaccesstoken", response.data.newAccessToken);
+     
         next();
       } else {
         return res.status(444).send({ message: "Failed to refresh token." });
@@ -59,19 +63,6 @@ app.use("/api/*", (req, res, next) => {
     middleware(req, res, next);
   }
 });
-
-const dbUrl = process.env.MONGO_URI || "mongodb://localhost:27017/kittydelivery";
-
-mongoose
-  .connect(dbUrl, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => {
-    console.log("Connected to the database!");
-  })
-  .catch((err) => {
-    console.log("Cannot connect to the database!", err);
-    process.exit();
-  });
-
 
 Object.entries(PROXY_TARGETS).forEach(([path, target]) => {
   app.use(

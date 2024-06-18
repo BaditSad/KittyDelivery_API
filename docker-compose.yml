@@ -2,6 +2,7 @@ version: '3.8'
 
 services:
   api:
+    container_name: API_Gateway
     build: .
     ports:
       - "3000:3000"
@@ -15,7 +16,7 @@ services:
       - MC_COMPONENT_URL=http://mc_component:3001
       - MC_USER_URL=http://mc_user:3002
       - MC_NOTIFICATION_URL=http://mc_notif:3003
-      - MC_ORDER_URL=http://mc_order:3004
+      - MC_ORDER_URL=http://nginx/mc_order
       - MC_AUTH_URL=http://mc_auth:3005
       - MC_ARTICLE_URL=http://mc_article:3006
       - MC_MENU_URL=http://mc_menu:3008

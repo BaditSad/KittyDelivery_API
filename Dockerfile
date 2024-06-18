@@ -4,11 +4,10 @@ FROM node:latest
 # Définir le répertoire de travail dans le conteneur
 WORKDIR /usr/src/app
 
-# Copier les fichiers package.json et package-lock.json dans le conteneur
+# Copy package.json and package-lock.json
 COPY package*.json ./
 
-# Installation des dépendances
-COPY package*.json ./
+# Install dependencies
 RUN npm install
 
 # Copie des fichiers de l'application
