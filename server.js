@@ -28,17 +28,22 @@ app.use(
 
 const middleware = async (req, res, next) => {
   const token = req.headers["authorization"];
+  
   if (!token) {
     return res.status(444).send({ message: "No token provided." });
   }
+
   try {
     jwt.verify(token.split(" ")[1], process.env.JWT_SECRET);
+
     next();
   } catch (err) {
     try {
       const response = await axios.post(TOKEN_REFRESH_URL, { token: token });
+  
       if (response.status === 201) {
         res.setHeader("Newaccesstoken", response.data.newAccessToken);
+  
         next();
       } else {
         return res.status(444).send({ message: "Failed to refresh token." });
