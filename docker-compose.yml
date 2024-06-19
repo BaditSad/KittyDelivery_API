@@ -11,7 +11,7 @@ services:
       - /app/node_modules
     environment:
       - PORT=3000
-      - JWT_SECRET=cestpourlasciencemerciderestercourtoi
+      - JWT_SECRET=4f358876d1128516c0b6e29e026fe14ee47300f54bbdc440a7eab415cfafd03a6c8b47f582ccd297ea765a2c666770680b9fcb573557912c1f63680e7956de2816e7f8689f6268fb5244d2bc16d4a77ad24c843ff685fc82b9c50d7f1284b0f6eeb658b949cf3b347c4ff6e188f3a04df281a10cda8f0dc9808d7440
       - TOKEN_REFRESH_URL=http://mc_auth:3005/refresh
       - MC_COMPONENT_URL=http://mc_component:3001
       - MC_USER_URL=http://mc_user:3002
