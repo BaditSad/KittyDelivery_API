@@ -4,8 +4,13 @@ const cors = require("cors");
 const axios = require("axios");
 const jwt = require("jsonwebtoken");
 const { createProxyMiddleware } = require("http-proxy-middleware");
+const swaggerUi = require("swagger-ui-express");
+const { mergeSwaggerFiles } = require("./swagger.config");
+
 const app = express();
 const port = process.env.PORT;
+const TOKEN_REFRESH_URL = process.env.TOKEN_REFRESH_URL;
+
 const PROXY_TARGETS = {
   mc_component: process.env.MC_COMPONENT_URL,
   mc_user: process.env.MC_USER_URL,
@@ -15,9 +20,8 @@ const PROXY_TARGETS = {
   mc_article: process.env.MC_ARTICLE_URL,
   mc_menu: process.env.MC_MENU_URL,
   mc_log: process.env.MC_LOG_URL,
-  mc_payment: process.env.MC_PAYMENT_URL,
+  mc_restaurant: process.env.MC_RESTAURANT_URL,
 };
-const TOKEN_REFRESH_URL = process.env.TOKEN_REFRESH_URL;
 
 app.use(
   cors({
@@ -27,22 +31,20 @@ app.use(
 
 const middleware = async (req, res, next) => {
   const token = req.headers["authorization"];
-  
+
   if (!token) {
     return res.status(444).send({ message: "No token provided." });
   }
-  
+
   try {
     jwt.verify(token.split(" ")[1], process.env.JWT_SECRET);
-  
     next();
   } catch (err) {
     try {
       const response = await axios.post(TOKEN_REFRESH_URL, { token: token });
-     
+
       if (response.status === 201) {
         res.setHeader("Newaccesstoken", response.data.newAccessToken);
-     
         next();
       } else {
         return res.status(444).send({ message: "Failed to refresh token." });
@@ -72,6 +74,11 @@ Object.entries(PROXY_TARGETS).forEach(([path, target]) => {
       changeOrigin: true,
     })
   );
+});
+
+mergeSwaggerFiles().then((mergedSwagger) => {
+  app.use("/api-docs", swaggerUi.serve);
+  app.get("/api-docs", swaggerUi.setup(mergedSwagger));
 });
 
 app.listen(port, () => console.log(`app running on http://localhost:${port}`));
