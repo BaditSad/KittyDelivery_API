@@ -22,6 +22,7 @@ services:
       - MC_MENU_URL=http://mc_menu:3008
       - MC_LOG_URL=http://mc_log:3009
       - MC_PAYMENT_URL=http://mc_payment:3010
+      - ALLOWED_ORIGIN=https://localhost:8080
     networks:
       - shared-net
 

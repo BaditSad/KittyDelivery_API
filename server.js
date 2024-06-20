@@ -1,4 +1,5 @@
 require("dotenv").config();
+
 const express = require("express");
 const cors = require("cors");
 const axios = require("axios");
@@ -9,9 +10,10 @@ const { mergeSwaggerFiles } = require("./swagger.config");
 const https = require("https");
 const fs = require("fs");
 const path = require("path");
+const allowRequest = require("./middlewares/allowRequest");
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT;
 const TOKEN_REFRESH_URL = process.env.TOKEN_REFRESH_URL;
 const key = fs.readFileSync(path.join(__dirname, "localhost-key.pem"));
 const cert = fs.readFileSync(path.join(__dirname, "localhost.pem"));
@@ -33,6 +35,8 @@ app.use(
     exposedHeaders: ["Newaccesstoken"],
   })
 );
+
+app.use(allowRequest);
 
 const middleware = async (req, res, next) => {
   const token = req.headers["authorization"];
@@ -95,5 +99,5 @@ mergeSwaggerFiles().then((mergedSwagger) => {
 const server = https.createServer({ key, cert }, app);
 
 server.listen(port, () => {
-  console.log(`Server is running at https://localhost:${port}`);
+  console.log(`🚀 Server is running at https://localhost:${port}`);
 });

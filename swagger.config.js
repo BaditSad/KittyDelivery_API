@@ -64,11 +64,15 @@ let mergedSwagger = {
 
 async function fetchSwaggerFile(url) {
   try {
-    const response = await axios.get(url);
-    console.log(`Successfully fetched ${url}`);
+    const response = await axios.get(url, {
+      headers: {
+        referer: "https://localhost:3000/api",
+      },
+    });
+    console.log(`✔️ Successfully fetched ${url}`);
     return response.data;
   } catch (error) {
-    console.error(`Error fetching ${url}:`, error.message);
+    console.error(`⚠️ Error fetching ${url}:`, error.message);
     return null;
   }
 }
@@ -112,7 +116,7 @@ async function mergeSwaggerFiles() {
       }
       mergedSwagger.tags.push({ name: tag });
     } else {
-      console.error(`Failed to fetch or parse Swagger file from ${url}`);
+      console.error(`❌ Failed to fetch or parse Swagger file from ${url}`);
     }
   }
   return mergedSwagger;
