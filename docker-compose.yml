@@ -21,7 +21,7 @@ services:
       - MC_ARTICLE_URL=http://mc_article:3006
       - MC_MENU_URL=http://mc_menu:3008
       - MC_LOG_URL=http://mc_log:3009
-      - MC_PAYMENT_URL=http://mc_payment:3010
+      - MC_RESTAURANT_URL=http://mc_payment:3010
       - ALLOWED_ORIGIN=https://localhost:8080
     networks:
       - shared-net

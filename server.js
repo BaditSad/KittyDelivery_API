@@ -40,7 +40,7 @@ app.use(allowRequest);
 
 const middleware = async (req, res, next) => {
   const token = req.headers["authorization"];
-
+  
   if (!token) {
     return res.status(444).send({ message: "No token provided." });
   }
@@ -50,7 +50,15 @@ const middleware = async (req, res, next) => {
     next();
   } catch (err) {
     try {
-      const response = await axios.post(TOKEN_REFRESH_URL, { token: token });
+      const response = await axios.post(
+        TOKEN_REFRESH_URL,
+        { token: token },
+        {
+          headers: {
+            referer: "https://localhost:3000/api",
+          },
+        }
+      );
 
       if (response.status === 201) {
         res.setHeader("Newaccesstoken", response.data.newAccessToken);
