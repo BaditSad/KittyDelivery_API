@@ -6,10 +6,15 @@ const jwt = require("jsonwebtoken");
 const { createProxyMiddleware } = require("http-proxy-middleware");
 const swaggerUi = require("swagger-ui-express");
 const { mergeSwaggerFiles } = require("./swagger.config");
+const https = require("https");
+const fs = require("fs");
+const path = require("path");
 
 const app = express();
-const port = process.env.PORT;
+const port = process.env.PORT || 3000;
 const TOKEN_REFRESH_URL = process.env.TOKEN_REFRESH_URL;
+const key = fs.readFileSync(path.join(__dirname, "localhost-key.pem"));
+const cert = fs.readFileSync(path.join(__dirname, "localhost.pem"));
 
 const PROXY_TARGETS = {
   mc_component: process.env.MC_COMPONENT_URL,
@@ -55,8 +60,14 @@ const middleware = async (req, res, next) => {
   }
 };
 
+const isRequestFromSwaggerUI = (req) => {
+  return req.headers.referer && req.headers.referer.includes("/api-docs");
+};
+
 app.use("/api/*", (req, res, next) => {
-  if (
+  if (isRequestFromSwaggerUI(req)) {
+    next();
+  } else if (
     req.originalUrl.startsWith("/api/mc_auth/login") ||
     req.originalUrl.startsWith("/api/mc_auth/register")
   ) {
@@ -81,4 +92,8 @@ mergeSwaggerFiles().then((mergedSwagger) => {
   app.get("/api-docs", swaggerUi.setup(mergedSwagger));
 });
 
-app.listen(port, () => console.log(`app running on http://localhost:${port}`));
+const server = https.createServer({ key, cert }, app);
+
+server.listen(port, () => {
+  console.log(`Server is running at https://localhost:${port}`);
+});
